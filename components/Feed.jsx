@@ -17,11 +17,8 @@ const Feed = () => {
   const [searchText, setSearchText] = useState('');
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
-    const tempPosts = posts.filter((post) => post.prompt?.toLowerCase().includes(searchText.toLowerCase()));
-    setFilteredPosts(tempPosts);
-  };
+  const [userInput, setUserInput] = useState(false);
+
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await fetch('/api/prompt');
@@ -31,6 +28,30 @@ const Feed = () => {
 
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    filterPostsByUserInput();
+  }, [searchText]);
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+    setUserInput(true);
+  };
+
+  const filterPostsByUserInput = () => {
+    const tempPosts = posts.filter(
+      (post) =>
+        post.prompt?.toLowerCase().includes(searchText.toLowerCase()) ||
+        post.tag?.toLowerCase().includes(searchText.toLowerCase()) ||
+        post.creator?.username.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredPosts(tempPosts);
+  };
+
+  const handleTagClick = (e) => {
+    setSearchText(e);
+    setUserInput(true);
+  };
   return (
     <section className="feed">
       <form className="relative w-full flex-center">
@@ -43,7 +64,7 @@ const Feed = () => {
           required
         />
       </form>
-      <PromptCardList data={filteredPosts || posts} handleTagClick={() => {}} />
+      <PromptCardList data={userInput ? filteredPosts : posts} handleTagClick={handleTagClick} />
     </section>
   );
 };

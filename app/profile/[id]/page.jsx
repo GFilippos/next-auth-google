@@ -1,14 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Profile from '@components/profile';
+import { useSession } from 'next-auth/react';
+import Profile from '@components/Profile';
 
-const MyProfile = () => {
-  const { data: session } = useSession();
+const page = ({ params, searchParams }) => {
   const [posts, setPosts] = useState([]);
   const router = useRouter();
+  const { data: session } = useSession();
+  const username = searchParams.name;
+  const promptId = params.id;
+
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await fetch(`/api/users/${session?.user.id}/posts`);
@@ -20,29 +23,28 @@ const MyProfile = () => {
   }, []);
 
   const handleEdit = (post) => {
-    router.push(`/update-prompt?id=${post._id}`);
+    router.push(`/update-prompt?id=${promptId}`);
   };
 
   const handleDelete = async (post) => {
     const hasConfirmed = confirm('Are you sure you want to delete this prompt?');
     if (hasConfirmed) {
       try {
-        await fetch(`/api/prompt/${post._id.toString()}`, {
+        await fetch(`/api/prompt/${promptId.toString()}`, {
           method: 'DELETE',
         });
 
-        const filteredPosts = posts.filter((p) => p._id !== post._id);
+        const filteredPosts = posts.filter((p) => p._id !== searchParams);
         setPosts(filteredPosts);
       } catch (error) {
         console.log(error);
       }
     }
   };
-
   return (
     <Profile
-      name="My"
-      desc="Welcome to your personal profile page"
+      name={`${username.substring(0, 1).toUpperCase()}${username.substring(1, username.length)}`}
+      desc={`Welcome to {username} personalized profile page. Explore ${username}'s exceptional prompts and be inspired by the power of their imagination!`}
       data={posts}
       handleEdit={handleEdit}
       handleDelete={handleDelete}
@@ -50,4 +52,4 @@ const MyProfile = () => {
   );
 };
 
-export default MyProfile;
+export default page;
