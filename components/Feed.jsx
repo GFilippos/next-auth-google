@@ -16,9 +16,12 @@ export const PromptCardList = ({ data, handleTagClick }) => {
 const Feed = () => {
   const [searchText, setSearchText] = useState('');
   const [posts, setPosts] = useState([]);
-
-  const handleSearchChange = (e) => {};
-
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+    const tempPosts = posts.filter((post) => post.prompt?.toLowerCase().includes(searchText.toLowerCase()));
+    setFilteredPosts(tempPosts);
+  };
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await fetch('/api/prompt');
@@ -28,7 +31,6 @@ const Feed = () => {
 
     fetchPosts();
   }, []);
-
   return (
     <section className="feed">
       <form className="relative w-full flex-center">
@@ -41,7 +43,7 @@ const Feed = () => {
           required
         />
       </form>
-      <PromptCardList data={posts} handleTagClick={() => {}} />
+      <PromptCardList data={filteredPosts || posts} handleTagClick={() => {}} />
     </section>
   );
 };

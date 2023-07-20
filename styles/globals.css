@@ -89,6 +89,10 @@
   @apply bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-500 bg-clip-text text-transparent;
 }
 
+.red_gradient {
+  @apply bg-gradient-to-r from-red-900 via-red-800 to-red-900 bg-clip-text text-transparent;
+}
+
 .green_gradient {
   @apply bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent;
 }
